@@ -1,22 +1,90 @@
-from flask import Flask, render_template
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airbnb - Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    header {
+      background-color: #ff385c;
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .hotel-list {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 20px;
+    }
+    .hotel-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin: 15px;
+      width: 300px;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+      text-align: center;
+    }
+    .hotel-card:hover {
+      transform: scale(1.03);
+    }
+    .hotel-card img {
+      width: 100%;
+      height: 200px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      object-fit: cover;
+    }
+    .hotel-card h3 {
+      margin: 10px 0 5px;
+    }
+    .hotel-card p {
+      margin-bottom: 15px;
+      color: #555;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #ff385c;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome to Airbnb</h1>
+  </header>
 
-app = Flask(__name__)
+  <section class="hotel-list">
+    <div class="hotel-card" onclick="location.href='hotel1.html'">
+      <img src="https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Luxury Stay Resort">
+      <h3>Luxury Stay Resort</h3>
+      <p>⭐ 4.8 | ₹6,000/night</p>
+    </div>
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+    <div class="hotel-card" onclick="location.href='hotel2.html'">
+      <img src="https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Sea View Paradise">
+      <h3>Sea View Paradise</h3>
+      <p>⭐ 4.6 | ₹5,200/night</p>
+    </div>
 
-@app.route('/hotel1')
-def hotel1():
-    return render_template('hotel1.html')
+    <div class="hotel-card" onclick="location.href='hotel3.html'">
+      <img src="https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Mountain Retreat">
+      <h3>Mountain Retreat</h3>
+      <p>⭐ 4.9 | ₹7,000/night</p>
+    </div>
+  </section>
 
-@app.route('/hotel2')
-def hotel2():
-    return render_template('hotel2.html')
-
-@app.route('/hotel3')
-def hotel3():
-    return render_template('hotel3.html')
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+  <footer>
+    <p>© 2025 Airbnb Clone. All rights reserved.</p>
+  </footer>
+</body>
+</html>
