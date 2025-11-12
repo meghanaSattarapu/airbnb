@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: air-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: air
+  template:
+    metadata:
+      labels:
+        app: air
+    spec:
+      containers:
+        - name: air
+          image: smeghana55/air:airbnbimage   # use your Docker Hub image
+          ports:
+            - containerPort: 5000
