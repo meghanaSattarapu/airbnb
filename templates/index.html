@@ -1,90 +1,182 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Airbnb - Home</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f5f5f5;
-    }
-    header {
-      background-color: #ff385c;
-      color: white;
-      text-align: center;
-      padding: 1rem 0;
-    }
-    .hotel-list {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      padding: 20px;
-    }
-    .hotel-card {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      margin: 15px;
-      width: 300px;
-      cursor: pointer;
-      transition: transform 0.2s ease-in-out;
-      text-align: center;
-    }
-    .hotel-card:hover {
-      transform: scale(1.03);
-    }
-    .hotel-card img {
-      width: 100%;
-      height: 200px;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      object-fit: cover;
-    }
-    .hotel-card h3 {
-      margin: 10px 0 5px;
-    }
-    .hotel-card p {
-      margin-bottom: 15px;
-      color: #555;
-    }
-    footer {
-      text-align: center;
-      padding: 10px;
-      background-color: #ff385c;
-      color: white;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Welcome to Airbnb</h1>
-  </header>
+from flask import Flask, render_template_string
 
-  <section class="hotel-list">
-    <div class="hotel-card" onclick="location.href='/hotel1'">
-      <img src="https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Luxury Stay Resort">
-      <h3>Luxury Stay Resort</h3>
-      <p>⭐ 4.8 | ₹6,000/night</p>
-    </div>
+app = Flask(__name__)
 
-    <div class="hotel-card" onclick="location.href='/hotel2'">
-      <img src="https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Sea View Paradise">
-      <h3>Sea View Paradise</h3>
-      <p>⭐ 4.6 | ₹5,200/night</p>
-    </div>
+# Home Page
+@app.route('/')
+def home():
+    return render_template_string("""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Airbnb - Home</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          background-color: #f2f2f2;
+          text-align: center;
+        }
+        header {
+          background-color: #FF5A5F;
+          color: white;
+          padding: 20px 0;
+        }
+        h1 {
+          margin: 0;
+        }
+        .hotel-list {
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+          margin: 30px;
+        }
+        .hotel-card {
+          background: white;
+          border-radius: 10px;
+          margin: 15px;
+          width: 280px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+          cursor: pointer;
+          transition: transform 0.2s;
+        }
+        .hotel-card:hover {
+          transform: scale(1.05);
+        }
+        .hotel-card img {
+          width: 100%;
+          height: 180px;
+          border-radius: 10px 10px 0 0;
+        }
+        .hotel-card h3 {
+          margin: 10px 0 5px;
+        }
+        .hotel-card p {
+          color: #555;
+          margin-bottom: 15px;
+        }
+        footer {
+          background: #222;
+          color: #aaa;
+          padding: 10px;
+          margin-top: 30px;
+        }
+      </style>
+    </head>
+    <body>
+      <header>
+        <h1>Welcome to Airbnb</h1>
+      </header>
 
-    <div class="hotel-card" onclick="location.href='/hotel3'">
-      <img src="https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Mountain Retreat">
-      <h3>Mountain Retreat</h3>
-      <p>⭐ 4.9 | ₹7,000/night</p>
-    </div>
-  </section>
+      <section class="hotel-list">
+        <div class="hotel-card" onclick="location.href='/hotel1'">
+          <img src="https://images.unsplash.com/photo-1551776235-dde6d4829808?auto=format&fit=crop&w=800&q=80" alt="Hotel 1">
+          <h3>Luxury Stay Resort</h3>
+          <p>⭐ 4.8 | ₹6,000/night</p>
+        </div>
 
-  <footer>
-    <p>© 2025 Airbnb Clone. All rights reserved.</p>
-  </footer>
-</body>
-</html>
+        <div class="hotel-card" onclick="location.href='/hotel2'">
+          <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" alt="Hotel 2">
+          <h3>Sea View Paradise</h3>
+          <p>⭐ 4.6 | ₹5,200/night</p>
+        </div>
+
+        <div class="hotel-card" onclick="location.href='/hotel3'">
+          <img src="https://images.unsplash.com/photo-1501117716987-c8e1ecb210ff?auto=format&fit=crop&w=800&q=80" alt="Hotel 3">
+          <h3>Mountain Retreat</h3>
+          <p>⭐ 4.9 | ₹7,000/night</p>
+        </div>
+      </section>
+
+      <footer>
+        <p>© 2025 Airbnb Clone. All rights reserved.</p>
+      </footer>
+    </body>
+    </html>
+    """)
+
+# Hotel 1 Page
+@app.route('/hotel1')
+def hotel1():
+    return render_template_string("""
+    <html>
+    <head>
+      <title>Luxury Stay Resort</title>
+      <style>
+        body { font-family: Arial; text-align:center; background:#f9f9f9; }
+        h1 { color:#FF5A5F; }
+        img { width:80%; border-radius:10px; margin:20px 0; }
+        p { width:80%; margin:auto; }
+        button {
+          background:#FF5A5F; color:white; padding:10px 20px; border:none; border-radius:5px;
+          cursor:pointer; margin-top:20px;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Luxury Stay Resort</h1>
+      <img src="https://images.unsplash.com/photo-1551776235-dde6d4829808?auto=format&fit=crop&w=1000&q=80">
+      <p>Enjoy a premium luxury experience with top-tier facilities and stunning views.</p>
+      <button onclick="location.href='/'">Back to Home</button>
+    </body>
+    </html>
+    """)
+
+# Hotel 2 Page
+@app.route('/hotel2')
+def hotel2():
+    return render_template_string("""
+    <html>
+    <head>
+      <title>Sea View Paradise</title>
+      <style>
+        body { font-family: Arial; text-align:center; background:#f9f9f9; }
+        h1 { color:#FF5A5F; }
+        img { width:80%; border-radius:10px; margin:20px 0; }
+        p { width:80%; margin:auto; }
+        button {
+          background:#FF5A5F; color:white; padding:10px 20px; border:none; border-radius:5px;
+          cursor:pointer; margin-top:20px;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Sea View Paradise</h1>
+      <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=80">
+      <p>Experience serene ocean views, comfortable rooms, and fresh sea breeze every morning.</p>
+      <button onclick="location.href='/'">Back to Home</button>
+    </body>
+    </html>
+    """)
+
+# Hotel 3 Page
+@app.route('/hotel3')
+def hotel3():
+    return render_template_string("""
+    <html>
+    <head>
+      <title>Mountain Retreat</title>
+      <style>
+        body { font-family: Arial; text-align:center; background:#f9f9f9; }
+        h1 { color:#FF5A5F; }
+        img { width:80%; border-radius:10px; margin:20px 0; }
+        p { width:80%; margin:auto; }
+        button {
+          background:#FF5A5F; color:white; padding:10px 20px; border:none; border-radius:5px;
+          cursor:pointer; margin-top:20px;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Mountain Retreat</h1>
+      <img src="https://images.unsplash.com/photo-1501117716987-c8e1ecb210ff?auto=format&fit=crop&w=1000&q=80">
+      <p>Relax in a peaceful mountain setting with modern comfort and breathtaking views.</p>
+      <button onclick="location.href='/'">Back to Home</button>
+    </body>
+    </html>
+    """)
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)
