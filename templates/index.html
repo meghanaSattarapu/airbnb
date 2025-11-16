@@ -1,182 +1,399 @@
-from flask import Flask, render_template_string
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mini Wordle</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --bg: #121213;
+      --tile-bg: #121213;
+      --text: #d7dadc;
+      --muted: #818384;
+      --green: #6aaa64;
+      --yellow: #c9b458;
+      --gray: #3a3a3c;
+      --card: #000;
+    }
+    *{box-sizing:border-box}
+    body{
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .wrap{
+      width:100%;
+      max-width:520px;
+      text-align:center;
+    }
+    h1{margin:0 0 8px;font-size:1.5rem}
+    p.lead{color:var(--muted); margin:6px 0 18px;font-size:0.95rem}
 
-app = Flask(__name__)
+    .board{
+      display:grid;
+      grid-template-rows: repeat(6, 1fr);
+      gap:8px;
+      margin: 0 auto 16px;
+      width:100%;
+    }
 
-# Home Page
-@app.route('/')
-def home():
-    return render_template_string("""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Airbnb - Home</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 0;
-          background-color: #f2f2f2;
-          text-align: center;
-        }
-        header {
-          background-color: #FF5A5F;
-          color: white;
-          padding: 20px 0;
-        }
-        h1 {
-          margin: 0;
-        }
-        .hotel-list {
-          display: flex;
-          justify-content: center;
-          flex-wrap: wrap;
-          margin: 30px;
-        }
-        .hotel-card {
-          background: white;
-          border-radius: 10px;
-          margin: 15px;
-          width: 280px;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-          cursor: pointer;
-          transition: transform 0.2s;
-        }
-        .hotel-card:hover {
-          transform: scale(1.05);
-        }
-        .hotel-card img {
-          width: 100%;
-          height: 180px;
-          border-radius: 10px 10px 0 0;
-        }
-        .hotel-card h3 {
-          margin: 10px 0 5px;
-        }
-        .hotel-card p {
-          color: #555;
-          margin-bottom: 15px;
-        }
-        footer {
-          background: #222;
-          color: #aaa;
-          padding: 10px;
-          margin-top: 30px;
-        }
-      </style>
-    </head>
-    <body>
-      <header>
-        <h1>Welcome to Airbnb</h1>
-      </header>
+    .row{
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap:8px;
+    }
 
-      <section class="hotel-list">
-        <div class="hotel-card" onclick="location.href='/hotel1'">
-          <img src="https://images.unsplash.com/photo-1551776235-dde6d4829808?auto=format&fit=crop&w=800&q=80" alt="Hotel 1">
-          <h3>Luxury Stay Resort</h3>
-          <p>⭐ 4.8 | ₹6,000/night</p>
-        </div>
+    .tile{
+      background:var(--tile-bg);
+      border: 2px solid rgba(255,255,255,0.06);
+      height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:1.25rem;
+      text-transform:uppercase;
+      border-radius:6px;
+      user-select:none;
+    }
 
-        <div class="hotel-card" onclick="location.href='/hotel2'">
-          <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" alt="Hotel 2">
-          <h3>Sea View Paradise</h3>
-          <p>⭐ 4.6 | ₹5,200/night</p>
-        </div>
+    .tile.filled{ border-color: rgba(255,255,255,0.14); }
 
-        <div class="hotel-card" onclick="location.href='/hotel3'">
-          <img src="https://images.unsplash.com/photo-1501117716987-c8e1ecb210ff?auto=format&fit=crop&w=800&q=80" alt="Hotel 3">
-          <h3>Mountain Retreat</h3>
-          <p>⭐ 4.9 | ₹7,000/night</p>
-        </div>
-      </section>
+    .tile.flip{
+      animation: flip .55s ease forwards;
+      transform-style:preserve-3d;
+      perspective:1000px;
+    }
+    @keyframes flip {
+      0%   { transform: rotateX(0deg); }
+      50%  { transform: rotateX(-90deg); }
+      100% { transform: rotateX(0deg); }
+    }
 
-      <footer>
-        <p>© 2025 Airbnb Clone. All rights reserved.</p>
-      </footer>
-    </body>
-    </html>
-    """)
+    .keyboard{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:8px;
+    }
+    .key-row{display:flex; justify-content:center; gap:6px}
+    .key{
+      background: #818384;
+      color: #fff;
+      border:none;
+      padding:10px 12px;
+      border-radius:4px;
+      min-width: 40px;
+      cursor:pointer;
+      text-transform:uppercase;
+      font-weight:700;
+      letter-spacing: 0.02em;
+    }
+    .key.big{min-width:64px}
 
-# Hotel 1 Page
-@app.route('/hotel1')
-def hotel1():
-    return render_template_string("""
-    <html>
-    <head>
-      <title>Luxury Stay Resort</title>
-      <style>
-        body { font-family: Arial; text-align:center; background:#f9f9f9; }
-        h1 { color:#FF5A5F; }
-        img { width:80%; border-radius:10px; margin:20px 0; }
-        p { width:80%; margin:auto; }
-        button {
-          background:#FF5A5F; color:white; padding:10px 20px; border:none; border-radius:5px;
-          cursor:pointer; margin-top:20px;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Luxury Stay Resort</h1>
-      <img src="https://images.unsplash.com/photo-1551776235-dde6d4829808?auto=format&fit=crop&w=1000&q=80">
-      <p>Enjoy a premium luxury experience with top-tier facilities and stunning views.</p>
-      <button onclick="location.href='/'">Back to Home</button>
-    </body>
-    </html>
-    """)
+    .kbd-green{ background: var(--green) !important; }
+    .kbd-yellow{ background: var(--yellow) !important; color:#111 !important;}
+    .kbd-gray{ background: var(--gray) !important; }
 
-# Hotel 2 Page
-@app.route('/hotel2')
-def hotel2():
-    return render_template_string("""
-    <html>
-    <head>
-      <title>Sea View Paradise</title>
-      <style>
-        body { font-family: Arial; text-align:center; background:#f9f9f9; }
-        h1 { color:#FF5A5F; }
-        img { width:80%; border-radius:10px; margin:20px 0; }
-        p { width:80%; margin:auto; }
-        button {
-          background:#FF5A5F; color:white; padding:10px 20px; border:none; border-radius:5px;
-          cursor:pointer; margin-top:20px;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Sea View Paradise</h1>
-      <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=80">
-      <p>Experience serene ocean views, comfortable rooms, and fresh sea breeze every morning.</p>
-      <button onclick="location.href='/'">Back to Home</button>
-    </body>
-    </html>
-    """)
+    .controls{ display:flex; gap:8px; justify-content:center; margin-top:12px; }
+    button.btn{
+      background:#222; color:var(--text); border: 1px solid rgba(255,255,255,0.06); padding:8px 12px; border-radius:6px; cursor:pointer;
+    }
 
-# Hotel 3 Page
-@app.route('/hotel3')
-def hotel3():
-    return render_template_string("""
-    <html>
-    <head>
-      <title>Mountain Retreat</title>
-      <style>
-        body { font-family: Arial; text-align:center; background:#f9f9f9; }
-        h1 { color:#FF5A5F; }
-        img { width:80%; border-radius:10px; margin:20px 0; }
-        p { width:80%; margin:auto; }
-        button {
-          background:#FF5A5F; color:white; padding:10px 20px; border:none; border-radius:5px;
-          cursor:pointer; margin-top:20px;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Mountain Retreat</h1>
-      <img src="https://images.unsplash.com/photo-1501117716987-c8e1ecb210ff?auto=format&fit=crop&w=1000&q=80">
-      <p>Relax in a peaceful mountain setting with modern comfort and breathtaking views.</p>
-      <button onclick="location.href='/'">Back to Home</button>
-    </body>
-    </html>
-    """)
+    .message{
+      min-height:22px;
+      color:var(--muted);
+      margin-top:12px;
+      font-size:0.95rem;
+    }
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    @media (max-width:420px){
+      .tile{ height:52px; font-size:1.05rem}
+      .key{ padding:8px 10px; min-width:32px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Mini Wordle</h1>
+    <p class="lead">Guess the 5-letter word — 6 tries. Click letters or use your keyboard.</p>
+
+    <div id="board" class="board" aria-hidden="false"></div>
+
+    <div class="keyboard" id="keyboard" aria-hidden="false"></div>
+
+    <div class="controls">
+      <button id="restart" class="btn">Restart</button>
+      <button id="show-answer" class="btn">Show Answer</button>
+    </div>
+
+    <div id="message" class="message" role="status" aria-live="polite"></div>
+  </div>
+
+<script>
+/*
+  Simple Wordle clone
+  - targetWords and allowedWords contain words in lowercase.
+  - You may extend the lists.
+*/
+
+const targetWords = [
+  "apple","brave","crane","drive","eagle","flame","grace","hotel","inner","judge",
+  "knock","light","mango","noble","ocean","pride","quake","risky","sharp","tiger",
+  "unity","vapor","whale","xenon","young","zebra"
+];
+
+const allowedWords = [
+  // Add common five-letter words so the game accepts them.
+  // For simplicity we include targetWords + a few more.
+  ...targetWords,
+  "about","other","which","their","there","could","would","these","first","second",
+  "place","plane","sound","water","money","child","party","music","truth","before",
+  "under","spend","great","small","start","later","score","clear","bring"
+];
+
+const ROWS = 6, COLS = 5;
+let boardEl = document.getElementById('board');
+let keyboardEl = document.getElementById('keyboard');
+let messageEl = document.getElementById('message');
+
+let state = {
+  board: Array.from({length: ROWS}, ()=>Array(COLS).fill('')),
+  row: 0,
+  col: 0,
+  target: '',
+  finished: false,
+  keyColors: {} // letter -> 'green'|'yellow'|'gray'
+};
+
+function pickTarget(){
+  return targetWords[Math.floor(Math.random()*targetWords.length)];
+}
+
+function createBoard(){
+  boardEl.innerHTML = '';
+  for(let r=0;r<ROWS;r++){
+    let row = document.createElement('div');
+    row.className = 'row';
+    for(let c=0;c<COLS;c++){
+      let t = document.createElement('div');
+      t.className = 'tile';
+      t.id = `tile-${r}-${c}`;
+      row.appendChild(t);
+    }
+    boardEl.appendChild(row);
+  }
+}
+
+const keysLayout = [
+  ['q','w','e','r','t','y','u','i','o','p'],
+  ['a','s','d','f','g','h','j','k','l'],
+  ['enter','z','x','c','v','b','n','m','back']
+];
+
+function createKeyboard(){
+  keyboardEl.innerHTML = '';
+  keysLayout.forEach(row=>{
+    let rowEl = document.createElement('div');
+    rowEl.className='key-row';
+    row.forEach(k=>{
+      let btn = document.createElement('button');
+      btn.className='key';
+      if(k==='enter' || k==='back') btn.classList.add('big');
+      btn.textContent = k==='back' ? '⌫' : k;
+      btn.dataset.key = k;
+      btn.addEventListener('click', ()=> handleKey(k));
+      rowEl.appendChild(btn);
+    });
+    keyboardEl.appendChild(rowEl);
+  });
+}
+
+function showMessage(msg, color){
+  messageEl.textContent = msg;
+  if(color==='error') messageEl.style.color = '#ff9b9b';
+  else messageEl.style.color = 'var(--muted)';
+}
+
+function updateTile(r,c){
+  let tile = document.getElementById(`tile-${r}-${c}`);
+  tile.textContent = state.board[r][c] ? state.board[r][c].toUpperCase() : '';
+  if(state.board[r][c]) tile.classList.add('filled');
+  else tile.classList.remove('filled');
+}
+
+function handleKey(k){
+  if(state.finished) return;
+  if(k === 'enter') return submitGuess();
+  if(k === 'back') return deleteLetter();
+  if(k.length===1 && /^[a-z]$/.test(k)){
+    insertLetter(k);
+  }
+}
+
+function insertLetter(letter){
+  if(state.col >= COLS) return;
+  state.board[state.row][state.col] = letter;
+  updateTile(state.row, state.col);
+  state.col++;
+}
+
+function deleteLetter(){
+  if(state.col<=0) return;
+  state.col--;
+  state.board[state.row][state.col] = '';
+  updateTile(state.row, state.col);
+}
+
+function submitGuess(){
+  if(state.col < COLS){
+    showMessage('Not enough letters', 'error');
+    return;
+  }
+  const guess = state.board[state.row].join('');
+  if(!allowedWords.includes(guess)){
+    showMessage('Word not in list', 'error');
+    shakeRow(state.row);
+    return;
+  }
+  showMessage('');
+  revealRow(state.row, guess);
+}
+
+function revealRow(r, guess){
+  // color logic with multiplicity handling
+  const target = state.target;
+  const result = Array(COLS).fill('gray');
+  const targetLetters = {}; // counts of each letter in target not matched green
+  for(let i=0;i<COLS;i++){
+    const t = target[i];
+    if(guess[i] === t) {
+      result[i]='green';
+    } else {
+      targetLetters[t] = (targetLetters[t]||0) + 1;
+    }
+  }
+  for(let i=0;i<COLS;i++){
+    if(result[i] === 'green') continue;
+    const g = guess[i];
+    if(targetLetters[g]){
+      result[i] = 'yellow';
+      targetLetters[g]--;
+    } else {
+      result[i] = 'gray';
+    }
+  }
+
+  // animate and set colors
+  for(let i=0;i<COLS;i++){
+    const tile = document.getElementById(`tile-${r}-${i}`);
+    (function(tile,i){
+      setTimeout(()=>{
+        tile.classList.add('flip');
+        // after small delay, set background
+        setTimeout(()=>{
+          tile.style.background = result[i] === 'green' ? 'var(--green)' : result[i] === 'yellow' ? 'var(--yellow)' : 'var(--gray)';
+          tile.style.color = result[i] === 'yellow' ? '#111' : '#fff';
+          tile.classList.remove('flip');
+        }, 260);
+      }, i*200);
+    })(tile,i);
+
+    // update keyboard color priority: green > yellow > gray
+    const letter = guess[i];
+    const prev = state.keyColors[letter];
+    if(prev==='green') continue;
+    if(result[i]==='green') state.keyColors[letter]='green';
+    else if(result[i]==='yellow' && prev!=='yellow') state.keyColors[letter]='yellow';
+    else if(!prev) state.keyColors[letter]='gray';
+  }
+
+  // apply keyboard colors after reveal
+  setTimeout(()=> applyKeyboardColors(), COLS*200 + 280);
+
+  // decide next step
+  setTimeout(()=>{
+    if(guess === target){
+      showMessage('Nice! You guessed it 🎉');
+      state.finished = true;
+    } else {
+      state.row++;
+      state.col=0;
+      if(state.row >= ROWS){
+        showMessage(`Out of tries — answer was "${target.toUpperCase()}"`);
+        state.finished = true;
+      }
+    }
+  }, COLS*200 + 300);
+}
+
+function applyKeyboardColors(){
+  // update button backgrounds
+  const buttons = keyboardEl.querySelectorAll('button.key');
+  buttons.forEach(btn=>{
+    const k = btn.dataset.key;
+    if(!k || k.length!==1) return;
+    const color = state.keyColors[k];
+    btn.classList.remove('kbd-green','kbd-yellow','kbd-gray');
+    if(color==='green') btn.classList.add('kbd-green');
+    else if(color==='yellow') btn.classList.add('kbd-yellow');
+    else if(color==='gray') btn.classList.add('kbd-gray');
+  });
+}
+
+function shakeRow(r){
+  const tiles = [];
+  for(let c=0;c<COLS;c++) tiles.push(document.getElementById(`tile-${r}-${c}`));
+  tiles.forEach((t,i)=>{
+    t.animate([{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}], {duration:300, iterations:1, delay: i*30});
+  });
+}
+
+function restart(){
+  state.board = Array.from({length: ROWS}, ()=>Array(COLS).fill(''));
+  state.row=0; state.col=0; state.finished=false; state.keyColors={};
+  state.target = pickTarget();
+  createBoard();
+  applyKeyboardColors();
+  showMessage('');
+  // clear tile styles
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const t = document.getElementById(`tile-${r}-${c}`);
+    t.style.background=''; t.style.color=''; t.classList.remove('filled','flip');
+    t.textContent = '';
+  }
+}
+
+function showAnswer(){
+  alert('Answer: ' + state.target.toUpperCase());
+}
+
+function init(){
+  state.target = pickTarget();
+  createBoard();
+  createKeyboard();
+  applyKeyboardColors();
+  showMessage('');
+  // physical keyboard
+  window.addEventListener('keydown', (e)=>{
+    if(state.finished) return;
+    const k = e.key.toLowerCase();
+    if(k === 'enter') handleKey('enter');
+    else if(k === 'backspace') handleKey('back');
+    else if(/^[a-z]$/.test(k) && k.length===1) handleKey(k);
+  });
+
+  document.getElementById('restart').addEventListener('click', restart);
+  document.getElementById('show-answer').addEventListener('click', showAnswer);
+}
+
+init();
+</script>
+</body>
+</html>
